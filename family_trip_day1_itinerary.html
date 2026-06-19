@@ -1,0 +1,882 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<style>
+  :root {
+    --bg: #f5f0e8;
+    --paper: #fffdf8;
+    --ink: #2c2416;
+    --muted: #7a6e60;
+    --line: #e2d5c0;
+    --accent: #b5632a;
+    --accent2: #3a7d6e;
+    --accent-light: #fdf0e6;
+    --teal: #3a7d6e;
+    --teal-light: #e8f4f1;
+    --sky: #2e6f9e;
+    --radius: 16px;
+    --shadow: 0 4px 20px rgba(44,36,22,.10);
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+  body {
+    font-family: -apple-system, "PingFang TC", "蘋方-繁", "Noto Sans TC", sans-serif;
+    background: var(--bg);
+    color: var(--ink);
+    line-height: 1.6;
+    font-size: 16px;
+  }
+
+  /* ── HERO ── */
+  .hero {
+    background: linear-gradient(160deg, #2c5364 0%, #3a7d6e 55%, #b5632a 100%);
+    color: #fff;
+    padding: 48px 20px 40px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+  .hero::before {
+    content: "";
+    position: absolute; inset: 0;
+    background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.04'%3E%3Ccircle cx='30' cy='30' r='20'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+    pointer-events: none;
+  }
+  .hero-tag {
+    display: inline-block;
+    background: rgba(255,255,255,.18);
+    border: 1px solid rgba(255,255,255,.3);
+    border-radius: 999px;
+    padding: 5px 16px;
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: .06em;
+    margin-bottom: 16px;
+  }
+  .hero h1 {
+    font-size: clamp(26px, 6vw, 44px);
+    font-weight: 900;
+    line-height: 1.15;
+    margin-bottom: 8px;
+  }
+  .hero p {
+    font-size: 17px;
+    opacity: .85;
+    margin-bottom: 28px;
+  }
+  .hero-actions { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; }
+  .btn {
+    display: inline-flex; align-items: center; gap: 7px;
+    padding: 10px 18px; border-radius: 999px; border: 0;
+    font-size: 14px; font-weight: 700; cursor: pointer;
+    text-decoration: none; transition: opacity .15s, transform .1s;
+  }
+  .btn:active { transform: scale(.97); }
+  .btn-primary { background: #fff; color: var(--accent); }
+  .btn-ghost { background: rgba(255,255,255,.18); color: #fff; border: 1px solid rgba(255,255,255,.35); }
+  .btn-map { background: var(--teal); color: #fff; font-size: 13px; padding: 8px 14px; }
+  .btn-copy { background: var(--accent); color: #fff; }
+  .btn-print { background: var(--ink); color: #fff; }
+
+  /* ── NAV ── */
+  .nav-wrap {
+    position: sticky; top: 0; z-index: 50;
+    background: rgba(255,253,248,.95);
+    backdrop-filter: blur(8px);
+    border-bottom: 1px solid var(--line);
+    padding: 0 12px;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+  .nav {
+    display: flex; gap: 2px;
+    max-width: 900px; margin: 0 auto;
+    padding: 8px 0;
+    white-space: nowrap;
+  }
+  .nav a {
+    text-decoration: none;
+    color: var(--muted);
+    font-size: 14px;
+    font-weight: 700;
+    padding: 7px 14px;
+    border-radius: 999px;
+    transition: background .15s, color .15s;
+  }
+  .nav a:hover, .nav a.active { background: var(--accent-light); color: var(--accent); }
+
+  /* ── LAYOUT ── */
+  .container { max-width: 780px; margin: 0 auto; padding: 0 16px; }
+
+  /* ── SECTION HEADER ── */
+  .sec-head {
+    padding: 36px 0 20px;
+    display: flex; align-items: center; gap: 12px;
+  }
+  .sec-head h2 { font-size: 22px; font-weight: 900; }
+  .sec-head .dot {
+    width: 8px; height: 8px; border-radius: 50%;
+    background: var(--accent); flex-shrink: 0;
+  }
+
+  /* ── SUMMARY CARD ── */
+  .summary-card {
+    background: var(--paper);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    padding: 20px;
+    box-shadow: var(--shadow);
+    margin-bottom: 8px;
+  }
+  .summary-row {
+    display: flex; align-items: flex-start;
+    padding: 10px 0;
+    border-bottom: 1px solid var(--line);
+    gap: 14px;
+  }
+  .summary-row:last-child { border-bottom: 0; }
+  .summary-time {
+    font-size: 13px; font-weight: 800; color: var(--accent);
+    min-width: 80px; padding-top: 2px;
+  }
+  .summary-name { font-weight: 700; font-size: 15px; }
+  .summary-sub { font-size: 13px; color: var(--muted); margin-top: 2px; }
+
+  /* ── TIMELINE ── */
+  .timeline { position: relative; padding: 4px 0 24px; }
+  .timeline::before {
+    content: "";
+    position: absolute; left: 18px; top: 0; bottom: 0;
+    width: 3px; background: linear-gradient(to bottom, var(--accent), var(--teal));
+    border-radius: 999px;
+  }
+
+  /* ── STOP CARD ── */
+  .stop { margin-bottom: 20px; padding-left: 54px; position: relative; }
+  .stop-dot {
+    position: absolute; left: 9px; top: 18px;
+    width: 20px; height: 20px; border-radius: 50%;
+    background: var(--paper); border: 3px solid var(--accent);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 9px;
+  }
+  .stop-dot.meal  { border-color: #c5862a; }
+  .stop-dot.stay  { border-color: var(--teal); }
+  .stop-dot.option { border-color: var(--sky); }
+  .stop-dot.spa   { border-color: #7a5c8a; }
+
+  .card {
+    background: var(--paper);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    overflow: hidden;
+  }
+  .card-head {
+    padding: 16px 18px 14px;
+    cursor: pointer;
+    display: flex; align-items: flex-start; gap: 14px;
+    user-select: none;
+  }
+  .card-head:hover { background: #fdfaf5; }
+  .card-icon { font-size: 22px; flex-shrink: 0; margin-top: 1px; }
+  .card-meta { flex: 1; }
+  .card-time { font-size: 12px; font-weight: 800; color: var(--muted); text-transform: uppercase; letter-spacing: .04em; margin-bottom: 3px; }
+  .card-name { font-size: 18px; font-weight: 900; color: var(--ink); line-height: 1.2; }
+  .card-loc  { font-size: 14px; color: var(--muted); margin-top: 3px; }
+  .card-tags { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
+  .tag {
+    font-size: 12px; font-weight: 800; padding: 3px 10px; border-radius: 999px;
+    background: var(--accent-light); color: var(--accent);
+  }
+  .tag.teal { background: var(--teal-light); color: var(--teal); }
+  .tag.sky  { background: #e6f0f8; color: var(--sky); }
+  .tag.gray { background: #f0ebe3; color: var(--muted); }
+  .tag.purple { background: #f0eaf6; color: #7a5c8a; }
+  .chevron { font-size: 16px; color: var(--muted); transition: transform .2s; flex-shrink: 0; margin-top: 4px; }
+  .card.open .chevron { transform: rotate(180deg); }
+
+  .card-body {
+    display: none;
+    border-top: 1px solid var(--line);
+    padding: 16px 18px 20px;
+    background: rgba(255,255,255,.5);
+  }
+  .card.open .card-body { display: block; }
+
+  .detail-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 14px; }
+  .detail-item { background: #fff; border: 1px solid var(--line); border-radius: 12px; padding: 11px 14px; }
+  .detail-label { font-size: 11px; font-weight: 800; color: var(--muted); text-transform: uppercase; letter-spacing: .06em; margin-bottom: 3px; }
+  .detail-val { font-size: 14px; font-weight: 600; color: var(--ink); }
+
+  .note-box {
+    background: #fffbe8; border: 1px dashed #d4b96a;
+    border-radius: 12px; padding: 12px 14px; margin-bottom: 14px;
+    font-size: 14px; color: #5a4a1c;
+  }
+  .note-box strong { display: block; margin-bottom: 4px; font-size: 12px; text-transform: uppercase; letter-spacing: .05em; color: #8a6a1c; }
+
+  .img-wrap {
+    border-radius: 12px; overflow: hidden; margin-bottom: 12px;
+    background: #e8e0d4; min-height: 160px;
+    display: flex; align-items: center; justify-content: center;
+    flex-direction: column; gap: 6px;
+    border: 1px solid var(--line);
+  }
+  .img-wrap img { width: 100%; height: 200px; object-fit: cover; display: block; }
+  .img-placeholder { padding: 32px; text-align: center; }
+  .img-placeholder .ph-icon { font-size: 36px; margin-bottom: 8px; }
+  .img-placeholder .ph-text { font-size: 13px; color: var(--muted); font-weight: 600; }
+  .img-credit { font-size: 11px; color: var(--muted); text-align: right; margin-top: 4px; }
+  .img-credit a { color: var(--muted); }
+
+  .card-actions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 14px; }
+
+  /* ── OPTION CARDS ── */
+  .option-label {
+    font-size: 12px; font-weight: 800; color: var(--sky);
+    text-transform: uppercase; letter-spacing: .06em;
+    margin-bottom: 8px; padding-left: 4px;
+  }
+  .option-group { display: grid; gap: 12px; margin-bottom: 20px; padding-left: 54px; }
+
+  /* ── PHOTO GRID ── */
+  .photo-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px; }
+  .photo-card {
+    background: var(--paper); border: 1px solid var(--line);
+    border-radius: var(--radius); overflow: hidden; box-shadow: var(--shadow);
+  }
+  .photo-card .img-wrap { border-radius: 0; margin: 0; border: 0; min-height: 140px; }
+  .photo-card .img-wrap img { height: 140px; }
+  .photo-info { padding: 12px 14px; }
+  .photo-info h3 { font-size: 15px; font-weight: 800; margin-bottom: 4px; }
+  .photo-info p { font-size: 12px; color: var(--muted); }
+
+  /* ── PLACES ── */
+  .place-list { display: grid; gap: 12px; }
+  .place-row {
+    background: var(--paper); border: 1px solid var(--line);
+    border-radius: var(--radius); padding: 16px 18px;
+    box-shadow: var(--shadow);
+    display: flex; align-items: center; justify-content: space-between; gap: 16px;
+  }
+  .place-row-info h3 { font-size: 16px; font-weight: 800; margin-bottom: 3px; }
+  .place-row-info p { font-size: 13px; color: var(--muted); }
+
+  /* ── NOTES ── */
+  .notes-card {
+    background: var(--paper); border: 1px solid var(--line);
+    border-radius: var(--radius); padding: 20px;
+    box-shadow: var(--shadow);
+  }
+  .checklist { display: grid; gap: 10px; }
+  .check-item { display: flex; gap: 12px; align-items: flex-start; }
+  .check-box {
+    width: 22px; height: 22px; border: 2px solid var(--line);
+    border-radius: 6px; flex-shrink: 0; margin-top: 1px;
+    cursor: pointer; display: flex; align-items: center; justify-content: center;
+    transition: background .15s, border-color .15s;
+  }
+  .check-box.checked { background: var(--teal); border-color: var(--teal); color: #fff; }
+  .check-text { font-size: 15px; padding-top: 1px; }
+  .check-item.checked-item .check-text { text-decoration: line-through; color: var(--muted); }
+
+  /* ── CREDITS ── */
+  .credits-card {
+    background: var(--paper); border: 1px solid var(--line);
+    border-radius: var(--radius); padding: 20px;
+    box-shadow: var(--shadow);
+    font-size: 13px; color: var(--muted);
+  }
+  .credits-card h3 { font-size: 15px; font-weight: 800; color: var(--ink); margin-bottom: 12px; }
+  .credit-item { padding: 8px 0; border-bottom: 1px solid var(--line); }
+  .credit-item:last-child { border-bottom: 0; }
+  .credit-item a { color: var(--teal); }
+
+  /* ── ACTIONS BAR ── */
+  .actions-bar {
+    background: var(--paper); border-top: 1px solid var(--line);
+    padding: 16px 20px;
+    display: flex; gap: 10px; flex-wrap: wrap; justify-content: center;
+  }
+
+  /* ── TOAST ── */
+  .toast {
+    position: fixed; bottom: 24px; left: 50%;
+    transform: translateX(-50%) translateY(12px);
+    background: var(--ink); color: #fff;
+    border-radius: 999px; padding: 10px 20px;
+    font-size: 14px; font-weight: 700;
+    opacity: 0; pointer-events: none;
+    transition: opacity .2s, transform .2s;
+    z-index: 200;
+  }
+  .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+  /* ── FOOTER ── */
+  .footer { text-align: center; padding: 32px 16px; color: var(--muted); font-size: 13px; }
+
+  @media (max-width: 600px) {
+    .detail-grid { grid-template-columns: 1fr; }
+    .photo-grid { grid-template-columns: 1fr; }
+    .place-row { flex-direction: column; align-items: flex-start; }
+    .hero { padding: 36px 16px 32px; }
+  }
+
+  @media print {
+    .nav-wrap, .hero-actions, .actions-bar, .toast, .btn-map,
+    .btn-copy, .btn-print, .card-actions { display: none !important; }
+    .card-body { display: block !important; }
+    body { background: #fff; }
+    .card, .summary-card, .notes-card { box-shadow: none; }
+    .timeline::before { display: none; }
+    .stop { padding-left: 0; }
+    .stop-dot { display: none; }
+  }
+</style>
+</head>
+<body>
+
+<!-- HERO -->
+<header class="hero">
+  <div class="hero-tag">🗓 第一天行程</div>
+  <h1>家族旅遊行程</h1>
+  <p>埔里・日月潭・溫泉小旅行</p>
+  <div class="hero-actions">
+    <button class="btn btn-primary" onclick="document.getElementById('timeline').scrollIntoView({behavior:'smooth'})">📋 查看行程</button>
+    <button class="btn btn-ghost" onclick="window.print()">🖨 列印 / 存PDF</button>
+    <button class="btn btn-ghost" onclick="copyLineText()">💬 複製給 LINE</button>
+  </div>
+</header>
+
+<!-- NAV -->
+<div class="nav-wrap">
+  <nav class="nav">
+    <a href="#overview">行程總覽</a>
+    <a href="#timeline">第一天</a>
+    <a href="#photos">景點照片</a>
+    <a href="#places">地圖導航</a>
+    <a href="#notes">注意事項</a>
+    <a href="#credits">圖片來源</a>
+  </nav>
+</div>
+
+<div class="container">
+
+  <!-- OVERVIEW -->
+  <section id="overview">
+    <div class="sec-head">
+      <span class="dot"></span>
+      <h2>行程總覽</h2>
+    </div>
+    <div class="summary-card">
+      <div class="summary-row">
+        <div class="summary-time">10:00–12:00</div>
+        <div>
+          <div class="summary-name">🏛 台灣工藝文化園區</div>
+          <div class="summary-sub">台灣工藝研究發展中心｜看藝術品、DIY</div>
+        </div>
+      </div>
+      <div class="summary-row">
+        <div class="summary-time">12:00–14:00</div>
+        <div>
+          <div class="summary-name">🍽 午餐（埔里）</div>
+          <div class="summary-sub">土角厝水上庭園餐廳｜素食有套餐</div>
+        </div>
+      </div>
+      <div class="summary-row">
+        <div class="summary-time">下午備案</div>
+        <div>
+          <div class="summary-name">🛍 日月町複合式商場 <span style="color:var(--muted);font-weight:400;font-size:13px;">or</span> 🐝 賴爺爺蜜蜂小森林</div>
+          <div class="summary-sub">視午餐結束時間與大家狀態彈性決定</div>
+        </div>
+      </div>
+      <div class="summary-row">
+        <div class="summary-time">15:00–16:00</div>
+        <div>
+          <div class="summary-name">🏡 Check in</div>
+          <div class="summary-sub">湖心庭民宿</div>
+        </div>
+      </div>
+      <div class="summary-row">
+        <div class="summary-time">16:00–18:00</div>
+        <div>
+          <div class="summary-name">♨️ 免費溫泉泡腳</div>
+          <div class="summary-sub">福興溫泉遊客中心｜從民宿開車約 3 分鐘</div>
+        </div>
+      </div>
+      <div class="summary-row">
+        <div class="summary-time">18:00–19:00</div>
+        <div>
+          <div class="summary-name">🔥 晚餐</div>
+          <div class="summary-sub">回到民宿烤肉 / 外送</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- TIMELINE -->
+  <section id="timeline">
+    <div class="sec-head">
+      <span class="dot"></span>
+      <h2>第一天詳細行程</h2>
+    </div>
+    <div class="timeline">
+
+      <!-- Stop 1: 工藝文化園區 -->
+      <div class="stop">
+        <div class="stop-dot">🏛</div>
+        <div class="card open" id="card1">
+          <div class="card-head" onclick="toggle('card1')">
+            <div class="card-icon">🏛</div>
+            <div class="card-meta">
+              <div class="card-time">10:00 – 12:00 ・景點</div>
+              <div class="card-name">台灣工藝文化園區</div>
+              <div class="card-loc">📍 台灣工藝研究發展中心</div>
+              <div class="card-tags"><span class="tag">免門票</span><span class="tag gray">停留約2小時</span></div>
+            </div>
+            <div class="chevron">▼</div>
+          </div>
+          <div class="card-body">
+            <div class="detail-grid">
+              <div class="detail-item"><div class="detail-label">活動內容</div><div class="detail-val">看藝術品、玩具、DIY 體驗</div></div>
+              <div class="detail-item"><div class="detail-label">費用</div><div class="detail-val">免門票（部分 DIY 另計）</div></div>
+            </div>
+            <div class="img-wrap">
+              <div class="img-placeholder">
+                <div class="ph-icon">🏛</div>
+                <div class="ph-text">待補官方照片</div>
+                <div style="font-size:12px;color:var(--muted);margin-top:4px;">建議至官方網站或觀光局取用</div>
+              </div>
+            </div>
+            <div class="img-credit">圖片來源：尚未放入正式圖片</div>
+            <div class="card-actions">
+              <a class="btn btn-map" href="https://maps.app.goo.gl/ujU86gMwrQWV6mtMA" target="_blank" rel="noopener">📍 Google Maps 導航</a>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Stop 2: 午餐 -->
+      <div class="stop">
+        <div class="stop-dot meal">🍽</div>
+        <div class="card" id="card2">
+          <div class="card-head" onclick="toggle('card2')">
+            <div class="card-icon">🍽</div>
+            <div class="card-meta">
+              <div class="card-time">12:00 – 14:00 ・午餐</div>
+              <div class="card-name">午餐（埔里）</div>
+              <div class="card-loc">📍 土角厝水上庭園餐廳</div>
+              <div class="card-tags"><span class="tag">素食有套餐</span><span class="tag gray">建議預訂</span></div>
+            </div>
+            <div class="chevron">▼</div>
+          </div>
+          <div class="card-body">
+            <div class="detail-grid">
+              <div class="detail-item"><div class="detail-label">素食</div><div class="detail-val">✅ 有素食套餐</div></div>
+              <div class="detail-item"><div class="detail-label">預算</div><div class="detail-val">尚未確認，建議先詢問</div></div>
+            </div>
+            <div class="img-wrap">
+              <div class="img-placeholder">
+                <div class="ph-icon">🍽</div>
+                <div class="ph-text">待補官方照片</div>
+              </div>
+            </div>
+            <div class="img-credit">圖片來源：尚未放入正式圖片</div>
+            <div class="card-actions">
+              <a class="btn btn-map" href="https://maps.app.goo.gl/XXxiw5LNFMW88T686" target="_blank" rel="noopener">📍 Google Maps 導航</a>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Option group -->
+      <div class="option-group">
+        <div class="option-label">⚡ 下午備案，擇一前往</div>
+
+        <!-- Option A -->
+        <div class="card" id="card3a">
+          <div class="card-head" onclick="toggle('card3a')">
+            <div class="card-icon">🛍</div>
+            <div class="card-meta">
+              <div class="card-time">下午景點 ・選項 A</div>
+              <div class="card-name">日月町複合式商場</div>
+              <div class="card-loc">📍 日月町複合式商場（日月潭附近）</div>
+              <div class="card-tags"><span class="tag sky">免門票</span><span class="tag gray">適合等入住前使用</span></div>
+            </div>
+            <div class="chevron">▼</div>
+          </div>
+          <div class="card-body">
+            <div class="detail-grid">
+              <div class="detail-item"><div class="detail-label">亮點</div><div class="detail-val">蔦屋書店、紅茶冰淇淋</div></div>
+              <div class="detail-item"><div class="detail-label">停車</div><div class="detail-val">1小時 NT$50，消費可折抵</div></div>
+            </div>
+            <div class="note-box">
+              <strong>📝 備註</strong>
+              書店內有冷氣，適合午餐後還未到三點時來吹冷氣、走走。
+            </div>
+            <div class="img-wrap">
+              <div class="img-placeholder">
+                <div class="ph-icon">🛍</div>
+                <div class="ph-text">待補官方照片</div>
+              </div>
+            </div>
+            <div class="img-credit">圖片來源：尚未放入正式圖片</div>
+            <div class="card-actions">
+              <a class="btn btn-map" href="https://www.google.com/maps/search/?api=1&query=日月町複合式商場" target="_blank" rel="noopener">📍 Google Maps 搜尋</a>
+            </div>
+          </div>
+        </div>
+
+        <!-- Option B -->
+        <div class="card" id="card3b">
+          <div class="card-head" onclick="toggle('card3b')">
+            <div class="card-icon">🐝</div>
+            <div class="card-meta">
+              <div class="card-time">下午景點 ・選項 B</div>
+              <div class="card-name">賴爺爺蜜蜂小森林</div>
+              <div class="card-loc">📍 賴爺爺蜜蜂小森林（南投縣）</div>
+              <div class="card-tags"><span class="tag sky">觀光工廠</span><span class="tag gray">親子友善</span></div>
+            </div>
+            <div class="chevron">▼</div>
+          </div>
+          <div class="card-body">
+            <div class="detail-grid">
+              <div class="detail-item"><div class="detail-label">類型</div><div class="detail-val">蜜蜂主題觀光工廠</div></div>
+              <div class="detail-item"><div class="detail-label">適合</div><div class="detail-val">親子、長輩</div></div>
+            </div>
+            <div class="img-wrap">
+              <div class="img-placeholder">
+                <div class="ph-icon">🐝</div>
+                <div class="ph-text">待補官方照片</div>
+              </div>
+            </div>
+            <div class="img-credit">圖片來源：尚未放入正式圖片</div>
+            <div class="card-actions">
+              <a class="btn btn-map" href="https://www.google.com/maps/search/?api=1&query=賴爺爺蜜蜂小森林" target="_blank" rel="noopener">📍 Google Maps 搜尋</a>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Stop 4: Check in -->
+      <div class="stop">
+        <div class="stop-dot stay">🏡</div>
+        <div class="card open" id="card4">
+          <div class="card-head" onclick="toggle('card4')">
+            <div class="card-icon">🏡</div>
+            <div class="card-meta">
+              <div class="card-time">15:00 – 16:00 ・Check in</div>
+              <div class="card-name">湖心庭民宿</div>
+              <div class="card-loc">📍 湖心庭民宿（日月潭）</div>
+              <div class="card-tags"><span class="tag teal">住宿</span></div>
+            </div>
+            <div class="chevron">▼</div>
+          </div>
+          <div class="card-body">
+            <div class="detail-grid">
+              <div class="detail-item"><div class="detail-label">辦理入住</div><div class="detail-val">15:00 起</div></div>
+              <div class="detail-item"><div class="detail-label">活動</div><div class="detail-val">休息、整理行李</div></div>
+            </div>
+            <div class="img-wrap">
+              <div class="img-placeholder">
+                <div class="ph-icon">🏡</div>
+                <div class="ph-text">待補民宿照片</div>
+              </div>
+            </div>
+            <div class="img-credit">圖片來源：尚未放入正式圖片</div>
+            <div class="card-actions">
+              <a class="btn btn-map" href="https://maps.app.goo.gl/y4dQnSvxCgsTRwi6" target="_blank" rel="noopener">📍 Google Maps 導航</a>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Stop 5: 溫泉 -->
+      <div class="stop">
+        <div class="stop-dot spa">♨️</div>
+        <div class="card" id="card5">
+          <div class="card-head" onclick="toggle('card5')">
+            <div class="card-icon">♨️</div>
+            <div class="card-meta">
+              <div class="card-time">16:00 – 18:00 ・溫泉</div>
+              <div class="card-name">免費溫泉泡腳</div>
+              <div class="card-loc">📍 福興溫泉遊客中心</div>
+              <div class="card-tags"><span class="tag purple">免費</span><span class="tag gray">自由前往</span></div>
+            </div>
+            <div class="chevron">▼</div>
+          </div>
+          <div class="card-body">
+            <div class="detail-grid">
+              <div class="detail-item"><div class="detail-label">費用</div><div class="detail-val">免費</div></div>
+              <div class="detail-item"><div class="detail-label">交通</div><div class="detail-val">開車約 3 分鐘<br>走路約 10 幾分鐘</div></div>
+            </div>
+            <div class="note-box">
+              <strong>📝 備註</strong>
+              從民宿自由前往，不一定全員都要參加。可依大家體力決定。
+            </div>
+            <div class="img-wrap">
+              <div class="img-placeholder">
+                <div class="ph-icon">♨️</div>
+                <div class="ph-text">待補官方照片</div>
+              </div>
+            </div>
+            <div class="img-credit">圖片來源：尚未放入正式圖片</div>
+            <div class="card-actions">
+              <a class="btn btn-map" href="https://maps.app.goo.gl/CaHWqoRE9NYBfWkd9" target="_blank" rel="noopener">📍 Google Maps 導航</a>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Stop 6: 晚餐 -->
+      <div class="stop">
+        <div class="stop-dot meal">🔥</div>
+        <div class="card open" id="card6">
+          <div class="card-head" onclick="toggle('card6')">
+            <div class="card-icon">🔥</div>
+            <div class="card-meta">
+              <div class="card-time">18:00 – 19:00 ・晚餐</div>
+              <div class="card-name">晚餐</div>
+              <div class="card-loc">📍 湖心庭民宿</div>
+              <div class="card-tags"><span class="tag">烤肉</span><span class="tag gray">外送備案</span></div>
+            </div>
+            <div class="chevron">▼</div>
+          </div>
+          <div class="card-body">
+            <div class="detail-grid">
+              <div class="detail-item"><div class="detail-label">形式</div><div class="detail-val">回民宿烤肉 或 外送</div></div>
+              <div class="detail-item"><div class="detail-label">地點</div><div class="detail-val">湖心庭民宿</div></div>
+            </div>
+            <div class="note-box">
+              <strong>📝 待確認</strong>
+              烤肉食材誰負責採購？外送備案餐廳？素食者的餐點？
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- /timeline -->
+  </section>
+
+  <!-- PHOTOS -->
+  <section id="photos">
+    <div class="sec-head">
+      <span class="dot"></span>
+      <h2>景點照片</h2>
+    </div>
+    <div class="photo-grid">
+      <div class="photo-card">
+        <div class="img-wrap"><div class="img-placeholder"><div class="ph-icon">🏛</div><div class="ph-text">台灣工藝研究發展中心<br>待補官方照片</div></div></div>
+        <div class="photo-info"><h3>台灣工藝研究發展中心</h3><p>建議至官方網站或觀光局取用授權圖片</p></div>
+      </div>
+      <div class="photo-card">
+        <div class="img-wrap"><div class="img-placeholder"><div class="ph-icon">🍽</div><div class="ph-text">土角厝水上庭園餐廳<br>待補官方照片</div></div></div>
+        <div class="photo-info"><h3>土角厝水上庭園餐廳</h3><p>建議至餐廳官方 FB 或觀光局取用</p></div>
+      </div>
+      <div class="photo-card">
+        <div class="img-wrap"><div class="img-placeholder"><div class="ph-icon">🏡</div><div class="ph-text">湖心庭民宿<br>待補官方照片</div></div></div>
+        <div class="photo-info"><h3>湖心庭民宿</h3><p>建議至民宿官網或訂房平台取用</p></div>
+      </div>
+      <div class="photo-card">
+        <div class="img-wrap"><div class="img-placeholder"><div class="ph-icon">♨️</div><div class="ph-text">福興溫泉遊客中心<br>待補官方照片</div></div></div>
+        <div class="photo-info"><h3>福興溫泉遊客中心</h3><p>建議至南投縣政府觀光網取用</p></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- PLACES -->
+  <section id="places">
+    <div class="sec-head">
+      <span class="dot"></span>
+      <h2>地圖導航</h2>
+    </div>
+    <div class="place-list">
+      <div class="place-row">
+        <div class="place-row-info">
+          <h3>🏛 台灣工藝研究發展中心</h3>
+          <p>第一站 ・ 10:00 抵達</p>
+        </div>
+        <a class="btn btn-map" href="https://maps.app.goo.gl/ujU86gMwrQWV6mtMA" target="_blank" rel="noopener">📍 導航</a>
+      </div>
+      <div class="place-row">
+        <div class="place-row-info">
+          <h3>🍽 土角厝水上庭園餐廳</h3>
+          <p>午餐 ・ 12:00 抵達</p>
+        </div>
+        <a class="btn btn-map" href="https://maps.app.goo.gl/XXxiw5LNFMW88T686" target="_blank" rel="noopener">📍 導航</a>
+      </div>
+      <div class="place-row">
+        <div class="place-row-info">
+          <h3>🛍 日月町複合式商場</h3>
+          <p>下午備案 A</p>
+        </div>
+        <a class="btn btn-map" href="https://www.google.com/maps/search/?api=1&query=日月町複合式商場" target="_blank" rel="noopener">🔍 搜尋</a>
+      </div>
+      <div class="place-row">
+        <div class="place-row-info">
+          <h3>🐝 賴爺爺蜜蜂小森林</h3>
+          <p>下午備案 B</p>
+        </div>
+        <a class="btn btn-map" href="https://www.google.com/maps/search/?api=1&query=賴爺爺蜜蜂小森林" target="_blank" rel="noopener">🔍 搜尋</a>
+      </div>
+      <div class="place-row">
+        <div class="place-row-info">
+          <h3>🏡 湖心庭民宿</h3>
+          <p>住宿 ・ Check in 15:00</p>
+        </div>
+        <a class="btn btn-map" href="https://maps.app.goo.gl/y4dQnSvxCgsTRwi6" target="_blank" rel="noopener">📍 導航</a>
+      </div>
+      <div class="place-row">
+        <div class="place-row-info">
+          <h3>♨️ 福興溫泉遊客中心</h3>
+          <p>免費泡腳 ・ 距民宿約3分鐘</p>
+        </div>
+        <a class="btn btn-map" href="https://maps.app.goo.gl/CaHWqoRE9NYBfWkd9" target="_blank" rel="noopener">📍 導航</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- NOTES -->
+  <section id="notes">
+    <div class="sec-head">
+      <span class="dot"></span>
+      <h2>注意事項</h2>
+    </div>
+    <div class="notes-card">
+      <div class="checklist" id="checklist">
+        <div class="check-item" onclick="toggleCheck(this)">
+          <div class="check-box">✓</div>
+          <div class="check-text">確認烤肉食材採購由誰負責</div>
+        </div>
+        <div class="check-item" onclick="toggleCheck(this)">
+          <div class="check-box">✓</div>
+          <div class="check-text">確認素食人數，準備素食選項</div>
+        </div>
+        <div class="check-item" onclick="toggleCheck(this)">
+          <div class="check-box">✓</div>
+          <div class="check-text">司機與車輛分配、停車費分攤</div>
+        </div>
+        <div class="check-item" onclick="toggleCheck(this)">
+          <div class="check-box">✓</div>
+          <div class="check-text">湖心庭民宿房型與床位確認</div>
+        </div>
+        <div class="check-item" onclick="toggleCheck(this)">
+          <div class="check-box">✓</div>
+          <div class="check-text">準備現金（部分景點僅收現金）</div>
+        </div>
+        <div class="check-item" onclick="toggleCheck(this)">
+          <div class="check-box">✓</div>
+          <div class="check-text">下載離線地圖（山區訊號較弱）</div>
+        </div>
+        <div class="check-item" onclick="toggleCheck(this)">
+          <div class="check-box">✓</div>
+          <div class="check-text">長輩、小孩用藥與特殊需求確認</div>
+        </div>
+        <div class="check-item" onclick="toggleCheck(this)">
+          <div class="check-box">✓</div>
+          <div class="check-text">雨天備案景點（日月潭文武廟等）</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CREDITS -->
+  <section id="credits">
+    <div class="sec-head">
+      <span class="dot"></span>
+      <h2>圖片來源與授權</h2>
+    </div>
+    <div class="credits-card">
+      <h3>本頁圖片使用說明</h3>
+      <div class="credit-item">台灣工藝研究發展中心｜圖片來源：尚未放入正式圖片 ／ 建議來源：<a href="https://www.ntcri.gov.tw/" target="_blank">ntcri.gov.tw 官方網站</a></div>
+      <div class="credit-item">土角厝水上庭園餐廳｜圖片來源：尚未放入正式圖片 ／ 建議來源：餐廳官方或南投觀光局</div>
+      <div class="credit-item">日月町複合式商場｜圖片來源：尚未放入正式圖片 ／ 建議來源：商場官方網站</div>
+      <div class="credit-item">賴爺爺蜜蜂小森林｜圖片來源：尚未放入正式圖片 ／ 建議來源：觀光工廠官方</div>
+      <div class="credit-item">湖心庭民宿｜圖片來源：尚未放入正式圖片 ／ 建議來源：民宿官網或 Booking.com</div>
+      <div class="credit-item">福興溫泉遊客中心｜圖片來源：尚未放入正式圖片 ／ 建議來源：<a href="https://travel.nantou.gov.tw/" target="_blank">南投縣政府觀光網</a></div>
+    </div>
+  </section>
+
+</div><!-- /container -->
+
+<!-- ACTIONS BAR -->
+<div class="actions-bar">
+  <button class="btn btn-copy" onclick="copyLineText()">💬 複製行程摘要給 LINE</button>
+  <button class="btn btn-print" onclick="window.print()">🖨 列印 / 存 PDF</button>
+  <button class="btn" style="background:var(--accent2);color:#fff;" onclick="expandAll()">📖 展開全部細節</button>
+</div>
+
+<div class="footer">
+  家族旅遊行程 ・ 埔里・日月潭・溫泉小旅行<br>
+  <span style="font-size:12px;">Day 2 / Day 3 行程即將加入</span>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+  function toggle(id) {
+    document.getElementById(id).classList.toggle('open');
+  }
+  function expandAll() {
+    document.querySelectorAll('.card').forEach(c => c.classList.add('open'));
+    showToast('已展開所有行程細節');
+  }
+  function toggleCheck(el) {
+    const box = el.querySelector('.check-box');
+    const checked = box.classList.toggle('checked');
+    el.classList.toggle('checked-item', checked);
+  }
+  function showToast(msg) {
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.classList.add('show');
+    setTimeout(() => t.classList.remove('show'), 2000);
+  }
+  async function copyLineText() {
+    const text = `🗓 家族旅遊 第一天行程
+埔里・日月潭・溫泉小旅行
+
+🏛 10:00–12:00 台灣工藝文化園區
+   → 台灣工藝研究發展中心｜DIY體驗
+
+🍽 12:00–14:00 午餐
+   → 土角厝水上庭園餐廳｜素食有套餐
+
+⚡ 下午備案（擇一）
+   A. 🛍 日月町複合式商場（蔦屋書店、冰淇淋）
+   B. 🐝 賴爺爺蜜蜂小森林
+
+🏡 15:00 Check in 湖心庭民宿
+
+♨️ 16:00–18:00 免費溫泉泡腳
+   → 福興溫泉遊客中心（從民宿開車3分鐘）
+
+🔥 18:00 晚餐
+   → 回民宿烤肉 / 外送`;
+    try {
+      await navigator.clipboard.writeText(text);
+      showToast('✅ 已複製！可貼到 LINE 群組');
+    } catch {
+      showToast('請手動複製（此環境不支援自動複製）');
+    }
+  }
+
+  // Active nav on scroll
+  const sections = ['overview','timeline','photos','places','notes','credits'];
+  const navLinks = document.querySelectorAll('.nav a');
+  window.addEventListener('scroll', () => {
+    let current = '';
+    sections.forEach(id => {
+      const el = document.getElementById(id);
+      if (el && el.getBoundingClientRect().top < 120) current = id;
+    });
+    navLinks.forEach(a => {
+      a.classList.toggle('active', a.getAttribute('href') === '#' + current);
+    });
+  });
+</script>
+</body>
+</html>
